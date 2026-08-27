@@ -1,0 +1,38 @@
+@media (max-width: 1024px) {
+  .container {
+    width: 94%;
+  }
+
+  .section {
+    padding: 70px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 55px 0;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 0 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: 92%;
+  }
+
+  .section {
+    padding: 45px 0;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+}

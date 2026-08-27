@@ -1,0 +1,280 @@
+.product-page {
+
+  min-height:100vh;
+
+  background:#f7f8f5;
+
+  color:#1f2937;
+
+}
+
+
+
+.product-container {
+
+  width:min(900px,92%);
+
+  margin:0 auto;
+
+  padding:48px 0 70px;
+
+}
+
+
+
+/* HEADER */
+
+.product-header {
+
+  margin-bottom:32px;
+
+}
+
+
+
+.product-label {
+
+  margin:0 0 8px;
+
+  font-size:13px;
+
+  font-weight:700;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  color:#4f7c54;
+
+}
+
+
+
+.product-header h1 {
+
+  margin:0;
+
+  font-size:36px;
+
+  font-weight:700;
+
+}
+
+
+
+.product-header p:last-child {
+
+  margin-top:10px;
+
+  color:#6b7280;
+
+}
+
+
+
+/* CARD */
+
+.product-card {
+
+  background:white;
+
+  border:1px solid #e5e7eb;
+
+  border-radius:14px;
+
+  padding:28px;
+
+  box-shadow:0 4px 14px rgba(0,0,0,0.04);
+
+}
+
+
+
+.product-card-header {
+
+  margin-bottom:24px;
+
+}
+
+
+
+.product-card-header h2 {
+
+  margin:0;
+
+  font-size:22px;
+
+}
+
+
+
+.product-card-header p {
+
+  margin-top:6px;
+
+  color:#6b7280;
+
+}
+
+
+
+/* FORM */
+
+.product-form {
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:18px;
+
+}
+
+
+
+.product-form-group {
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+
+}
+
+
+
+.product-form-group label {
+
+  font-size:14px;
+
+  font-weight:600;
+
+}
+
+
+
+.product-form-group input {
+
+  padding:12px 14px;
+
+  border:1px solid #d1d5db;
+
+  border-radius:8px;
+
+  font-size:14px;
+
+  outline:none;
+
+}
+
+
+
+.product-form-group input:focus {
+
+  border-color:#4f7c54;
+
+  box-shadow:0 0 0 3px rgba(79,124,84,0.12);
+
+}
+
+
+
+/* BUTTON */
+
+.product-submit-button {
+
+  grid-column:span 2;
+
+  border:none;
+
+  border-radius:8px;
+
+  padding:12px 22px;
+
+  background:#355e3b;
+
+  color:white;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+}
+
+
+
+.product-submit-button:hover {
+
+  opacity:0.9;
+
+}
+
+
+
+.product-submit-button:disabled {
+
+  opacity:0.6;
+
+  cursor:not-allowed;
+
+}
+
+
+
+/* MESSAGE */
+
+.product-message {
+
+  margin-top:20px;
+
+  padding:12px 14px;
+
+  border-radius:8px;
+
+}
+
+
+
+.product-message.success {
+
+  background:#ecfdf3;
+
+  border:1px solid #bbf7d0;
+
+  color:#166534;
+
+}
+
+
+
+.product-message.error {
+
+  background:#fef2f2;
+
+  border:1px solid #fecaca;
+
+  color:#991b1b;
+
+}
+
+
+
+/* RESPONSIVE */
+
+@media(max-width:700px){
+
+  .product-form{
+
+    grid-template-columns:1fr;
+
+  }
+
+
+  .product-submit-button{
+
+    grid-column:auto;
+
+  }
+
+}
