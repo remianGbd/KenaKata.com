@@ -1,0 +1,371 @@
+const express = require("express");
+
+const router = express.Router();
+
+const pool = require("../config/db");
+
+const verifyToken = require("../middleware/authMiddleware");
+
+const checkRole = require("../middleware/roleMiddleware");
+
+
+router.post("/",
+
+    verifyToken,
+
+checkRole("VENDOR"),
+
+ async (req, res) => {
+
+  try {
+
+    const { market_id, store_name, address } = req.body;
+
+    const vendor_id = req.user.user_id;  //logged in vendor er id, onno vendor er jonno store create korte parbe na
+
+
+    const result = await pool.query(
+
+      `
+
+      INSERT INTO stores
+
+      (
+
+          vendor_id,
+
+          market_id,
+
+          store_name,
+
+          address
+
+      )
+
+      VALUES($1,$2,$3,$4)
+
+      RETURNING *
+
+      `,
+
+      [vendor_id, market_id, store_name, address]
+
+    );
+
+    res.status(201).json(result.rows[0]);
+
+  } 
+
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({ message: error.message });
+
+  }
+
+});
+
+
+
+
+
+router.get("/", async (req, res) => {
+
+  try {
+
+    const { market_id } = req.query;
+
+    const result = await pool.query(
+
+      `
+
+      SELECT *
+
+      FROM stores
+
+      WHERE market_id = $1
+
+      ORDER BY store_id
+
+      `,
+
+      [market_id]
+
+    );
+
+    res.json(result.rows);
+
+  } 
+
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({ message: "Failed to fetch stores" });
+
+  }
+
+});
+
+
+
+
+
+router.get("/:id", async (req, res) => {
+
+  try {
+
+    const store_id = req.params.id;
+
+    const result = await pool.query(
+
+      `
+
+      SELECT
+
+          s.store_id,
+
+          s.vendor_id,
+
+          s.store_name,
+
+          s.address,
+
+          u.name AS vendor_name
+
+      FROM stores s
+
+      JOIN vendors v
+
+      ON s.vendor_id = v.user_id
+
+      JOIN users u
+
+      ON v.user_id = u.user_id
+
+      WHERE s.store_id=$1
+
+      `,
+
+      [store_id]
+
+    );
+
+    if (result.rows.length === 0) {
+
+      return res.status(404).json({ message: "Store not found" });
+
+    }
+
+    res.json(result.rows[0]);
+
+  } 
+
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({ message: error.message });
+
+  }
+
+});
+
+
+
+
+
+router.patch("/:id",
+
+    verifyToken,
+
+checkRole("VENDOR"),
+
+    async (req, res) => {
+
+  try {
+
+    const store_id = req.params.id;
+
+    const { store_name, address } = req.body;
+
+    const vendor_id = req.user.user_id;  //logged in vendor er id
+
+
+    const result = await pool.query(
+
+      `
+
+      UPDATE stores
+
+      SET
+
+          store_name=$1,
+
+          address=$2
+
+      WHERE store_id=$3
+
+      AND vendor_id=$4
+
+      RETURNING *
+
+      `,
+
+      [
+
+        store_name,
+
+        address,
+
+        store_id,
+
+        vendor_id
+
+      ]
+
+    );
+
+
+    if (result.rows.length === 0) {
+
+      return res.status(403).json({
+
+        message:"You cannot update this store"
+
+      });
+
+    }
+
+
+    res.json({
+
+      message: "Store updated successfully",
+
+      store: result.rows[0],
+
+    });
+
+  } 
+
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({ message: error.message });
+
+  }
+
+});
+
+
+
+
+
+
+
+router.delete("/:id", 
+
+    verifyToken,
+
+checkRole("VENDOR"),
+
+    async (req, res) => {
+
+  try {
+
+    const store_id = req.params.id;
+
+    const vendor_id = req.user.user_id;  //logged in vendor er id
+
+
+
+    const products = await pool.query(
+
+      `
+
+      SELECT product_id
+
+      FROM products
+
+      WHERE store_id=$1
+
+      `,
+
+      [store_id]
+
+    );
+
+
+    if (products.rows.length > 0) {
+
+      return res.status(400).json({
+
+        message: "Cannot delete store because products exist under this store",
+
+      });
+
+    }
+
+
+
+
+    const result = await pool.query(
+
+      `
+
+      DELETE FROM stores
+
+      WHERE store_id=$1
+
+      AND vendor_id=$2
+
+      RETURNING *
+
+      `,
+
+      [
+
+        store_id,
+
+        vendor_id
+
+      ]
+
+    );
+
+
+    if (result.rows.length === 0) {
+
+      return res.status(403).json({
+
+        message:"You cannot delete this store"
+
+      });
+
+    }
+
+
+    res.json({
+
+      message: "Store deleted successfully",
+
+      store: result.rows[0],
+
+    });
+
+  } 
+
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({ message: error.message });
+
+  }
+
+});
+
+
+module.exports = router;
