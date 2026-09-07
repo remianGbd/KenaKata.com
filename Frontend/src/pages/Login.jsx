@@ -12,17 +12,18 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const roleHome = () => {
-    return '/profile';
+  const roleHome = (role) => {
+    return role === 'VENDOR' ? '/seller/dashboard' : '/profile';
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = login(email, password);
-    if (user) {
+    setError('');
+    try {
+      const user = await login(email, password);
       navigate(roleHome(user.role));
-    } else {
-      setError('Invalid email or password');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Invalid email or password');
     }
   };
 

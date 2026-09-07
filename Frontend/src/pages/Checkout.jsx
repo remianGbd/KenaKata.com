@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Toast from '../components/Toast';
 import { useCart } from '../context/CartContext';
+import { createOrder, createOrderItem } from '../services/orderService';
 import './Checkout.css';
 
 function Checkout() {
@@ -28,15 +29,27 @@ function Checkout() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.fullName || !form.phone || !form.address || !form.area) {
       setToastMsg('Please fill in all required shipping fields');
       setShowToast(true);
       return;
     }
-    clearCart();
-    navigate('/orders');
+    try {
+      const order = await createOrder(total);
+      await Promise.all(items.map((item) => createOrderItem({
+        order_id: order.order_id,
+        product_id: item.id,
+        quantity: item.quantity,
+        price_at_purchase: item.price,
+      })));
+      clearCart();
+      navigate('/orders');
+    } catch (error) {
+      setToastMsg(error.response?.data?.message || 'Unable to place order');
+      setShowToast(true);
+    }
   };
 
   const [toastMsg, setToastMsg] = useState('');

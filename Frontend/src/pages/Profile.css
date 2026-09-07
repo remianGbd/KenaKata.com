@@ -18,6 +18,23 @@
 
 .profile-logout:hover { background: #c62828; color: #ffffff; }
 
+.profile-actions { display: flex; gap: 8px; }
+.profile-edit, .profile-save, .profile-cancel { padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.profile-edit, .profile-cancel { background: #ffffff; border: 1px solid #dedfd8; color: #11120f; }
+.profile-edit:hover, .profile-cancel:hover { border-color: #11120f; }
+.profile-edit-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; padding: 24px; background: #ffffff; border: 1px solid #dedfd8; border-radius: 12px; }
+.profile-edit-form h2 { grid-column: 1 / -1; margin: 0; font-size: 20px; }
+.profile-security-heading { grid-column: 1 / -1; padding-top: 8px; border-top: 1px solid #ecece7; }
+.profile-security-heading h3 { margin: 0 0 4px; font-size: 16px; }
+.profile-security-heading span { color: #85877f; font-size: 12px; font-weight: 400; }
+.profile-edit-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #11120f; }
+.profile-edit-form input { padding: 11px 12px; border: 1px solid #dedfd8; border-radius: 8px; font-size: 14px; }
+.profile-edit-form input:focus { outline: none; border-color: #11120f; }
+.profile-form-actions { grid-column: 1 / -1; display: flex; gap: 8px; }
+.profile-save { border: 1px solid #11120f; background: #11120f; color: #ffffff; }
+.profile-save:disabled { opacity: .6; cursor: wait; }
+.profile-error { grid-column: 1 / -1; margin: 0; padding: 10px 12px; border-radius: 8px; background: #fdecea; color: #c62828; font-size: 13px; }
+
 .profile-links { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 .profile-link-card { display: flex; flex-direction: column; gap: 4px; background: #ffffff; border: 1px solid #dedfd8; border-radius: 12px; padding: 20px; text-decoration: none; transition: all 0.2s ease; }
@@ -29,6 +46,10 @@
 .profile-link-card span { font-size: 13px; color: #85877f; }
 
 @media (max-width: 600px) {
+  .profile-actions { width: 100%; }
+  .profile-actions button { flex: 1; }
+  .profile-edit-form { grid-template-columns: 1fr; }
+  .profile-edit-form h2, .profile-form-actions, .profile-error { grid-column: auto; }
   .profile-links { grid-template-columns: 1fr; }
   .profile-container { padding: 24px 16px 40px; }
 }

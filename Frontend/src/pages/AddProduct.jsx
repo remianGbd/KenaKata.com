@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { createProduct } from "../services/api";
+import { createProduct } from "../services/productService";
 import "./AddProduct.css";
 
 

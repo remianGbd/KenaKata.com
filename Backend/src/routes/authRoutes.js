@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = require("../middleware/authMiddleware");
 const checkRole = require("../middleware/roleMiddleware");
+const { revokeToken } = require("../middleware/tokenBlacklist");
 
 
 //register a user
@@ -26,10 +27,12 @@ router.post("/register", async(req,res)=>{
             business_name
         } = req.body;
 
+        const normalizedEmail = String(email || "").trim().toLowerCase();
+
 
         // validation
 
-        if(!name || !email || !password || !role){
+        if(!name || !normalizedEmail || !password || !role){
 
             return res.status(400).json({
                 message:"Required fields missing"
@@ -43,6 +46,14 @@ router.post("/register", async(req,res)=>{
             });
             }
 
+        if(password.length < 6){
+            return res.status(400).json({ message:"Password must be at least 6 characters" });
+        }
+
+        if(role === "VENDOR" && !String(business_name || "").trim()){
+            return res.status(400).json({ message:"Business name is required for vendors" });
+        }
+
 
            await client.query("BEGIN");
 
@@ -54,7 +65,7 @@ router.post("/register", async(req,res)=>{
             FROM users
             WHERE email=$1
             `,
-            [email]
+            [normalizedEmail]
         );
 
 
@@ -91,7 +102,7 @@ router.post("/register", async(req,res)=>{
             `,
             [
                 name,
-                email,
+                normalizedEmail,
                 phone,
                 password_hash,
                 role
@@ -143,9 +154,16 @@ router.post("/register", async(req,res)=>{
 
          await client.query("COMMIT");
 
+                    const token = jwt.sign(
+                        { user_id, role },
+                        process.env.JWT_SECRET,
+                        { expiresIn: "1d" }
+                    );
+
           res.status(201).json({
 
             message:"Registration successful",
+            token,
 
             user:Userresult.rows[0]
 
@@ -186,9 +204,10 @@ router.post("/login", async(req,res)=>{
     try{
 
         const {  email, password } = req.body;
+        const normalizedEmail = String(email || "").trim().toLowerCase();
 
 
-        if(!email || !password){
+        if(!normalizedEmail || !password){
 
             return res.status(400).json({
 
@@ -208,7 +227,7 @@ router.post("/login", async(req,res)=>{
             WHERE email=$1
             `,
 
-            [email]
+            [normalizedEmail]
 
         );
 
@@ -293,6 +312,9 @@ router.post("/login", async(req,res)=>{
    router.post("/logout",
     verifyToken,
         (req,res)=>{
+
+        const token = req.headers.authorization.split(" ")[1];
+        revokeToken(token);
 
         res.json({
       message:"Logout successful"

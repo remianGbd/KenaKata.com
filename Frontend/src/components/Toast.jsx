@@ -6,7 +6,7 @@ function Toast({ show, message, onHide }) {
     if (!show) return;
     const timer = setTimeout(() => onHide(), 2500);
     return () => clearTimeout(timer);
-  }, [show]);
+  }, [show, onHide]);
 
   if (!show) return null;
 

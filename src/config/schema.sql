@@ -47,6 +47,9 @@ CREATE TABLE stores (
     market_id INTEGER NOT NULL,
     store_name VARCHAR(150) NOT NULL,
     address TEXT NOT NULL,
+    description TEXT,
+    logo_url TEXT,
+    category VARCHAR(100),
 
     FOREIGN KEY (vendor_id)
         REFERENCES vendors(user_id)
@@ -69,7 +72,10 @@ CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     store_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL,
+    category_names TEXT[],
     name VARCHAR(150) NOT NULL,
+    description TEXT,
+    image_url TEXT,
     price DECIMAL(10,2) NOT NULL,
     stock_qty INTEGER NOT NULL DEFAULT 0,
 

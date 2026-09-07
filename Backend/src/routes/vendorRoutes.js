@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require("../config/db");
 const verifyToken=require("../middleware/authMiddleware");
 const checkRole=require("../middleware/roleMiddleware");
+const bcrypt = require("bcrypt");
 
 
 router.post("/", async (req, res) => {
@@ -143,18 +144,47 @@ router.patch("/:id",
       });
 
     }
-           const { name, phone, business_name } = req.body;
+           const { name, phone, email, business_name, current_password, new_password } = req.body;
 
-    await pool.query(
-      `
-      UPDATE users
-      SET
-          name=$1,
-          phone=$2
-      WHERE user_id=$3
-      `,
-      [name, phone, user_id]
+    if(!name || !email || !business_name){
+      return res.status(400).json({ message:"Name, email and business name are required" });
+    }
+
+    const existingEmail = await pool.query(
+      `SELECT user_id FROM users WHERE email=$1 AND user_id<>$2`,
+      [email, user_id]
     );
+    if(existingEmail.rows.length > 0){
+      return res.status(409).json({ message:"This email is already in use" });
+    }
+
+    if(new_password){
+      if(!current_password){
+        return res.status(400).json({ message:"Current password is required to set a new password" });
+      }
+      if(new_password.length < 6){
+        return res.status(400).json({ message:"New password must be at least 6 characters" });
+      }
+      const passwordResult = await pool.query(
+        `SELECT password_hash FROM users WHERE user_id=$1`,
+        [user_id]
+      );
+      const passwordMatches = await bcrypt.compare(current_password, passwordResult.rows[0].password_hash);
+      if(!passwordMatches){
+        return res.status(400).json({ message:"Current password is incorrect" });
+      }
+      const passwordHash = await bcrypt.hash(new_password, 10);
+      await pool.query(
+        `UPDATE users SET name=$1, phone=$2, email=$3, password_hash=$4 WHERE user_id=$5`,
+        [name, phone || null, email, passwordHash, user_id]
+      );
+    } else {
+      await pool.query(
+        `UPDATE users SET name=$1, phone=$2, email=$3 WHERE user_id=$4`,
+        [name, phone || null, email, user_id]
+      );
+    }
+
     const result = await pool.query(
       `
       UPDATE vendors

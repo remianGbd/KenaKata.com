@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { getMarkets, createMarket } from '../services/api';
+// import { getMarkets, createMarket } from '../services/api';
+import { getMarkets, createMarket } from '../services/storeService';
 import './AdminDashboard.css';
 
 function AdminDashboard() {

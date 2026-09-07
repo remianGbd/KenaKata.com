@@ -609,190 +609,243 @@
 
 // export default Reservations;
 
-import { useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+// import { useState } from 'react';
+// import { useSearchParams, Link } from 'react-router-dom';
+// import Navbar from '../components/Navbar';
+// import Footer from '../components/Footer';
+// import Toast from '../components/Toast';
+// import { reservations as initialReservations } from '../services/reservationService';
+// import { products, getReservableProducts } from '../services/productService';
+// import './Reservations.css';
+
+// function Reservations() {
+//   const [searchParams, setSearchParams] = useSearchParams();
+//   const showForm = searchParams.get('new') === '1';
+//   const presetProduct = searchParams.get('product') || '';
+
+//   const reservable = getReservableProducts();
+
+//   const [filter, setFilter] = useState('all');
+//   const [list, setList] = useState(initialReservations);
+//   const [showToast, setShowToast] = useState(false);
+//   const [toastMsg, setToastMsg] = useState('');
+//   const [form, setForm] = useState({
+//     product: presetProduct,
+//     date: '',
+//     time: '',
+//     notes: ''
+//   });
+
+//   const statuses = ['all', 'Confirmed', 'Pending', 'Completed', 'Cancelled'];
+
+//   const filtered = filter === 'all' ? list : list.filter(r => r.status === filter);
+
+//   const selectedProduct = products.find(p => p.name === form.product);
+
+//   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!form.product || !form.date || !form.time) {
+//       setToastMsg('Please select product, date and time');
+//       setShowToast(true);
+//       return;
+//     }
+//     const newReservation = {
+//       id: `RES-${100 + list.length + 1}`,
+//       product: form.product,
+//       store: selectedProduct.store,
+//       price: selectedProduct.price,
+//       date: new Date(form.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+//       time: form.time,
+//       notes: form.notes,
+//       status: 'Pending'
+//     };
+//     setList([newReservation, ...list]);
+//     setSearchParams({});
+//     setForm({ product: '', date: '', time: '', notes: '' });
+//     setToastMsg('Reservation request submitted');
+//     setShowToast(true);
+//   };
+
+//   return (
+//     <div className="reservations-page">
+//       <Navbar />
+
+//       <div className="reservations-container">
+//         <div className="reservations-header">
+//           <div>
+//             <h1>My Reservations</h1>
+//             <p>Reserve premium products (above ৳5,000) and manage your bookings</p>
+//           </div>
+//           <div className="reservations-header-actions">
+//             <Link to="/cart" className="header-secondary-btn">View Cart</Link>
+//             {!showForm && (
+//               <button className="new-reservation-btn" onClick={() => setSearchParams({ new: '1' })}>
+//                 + New Reservation
+//               </button>
+//             )}
+//           </div>
+//         </div>
+
+//         {showForm && (
+//           <form className="reservation-form" onSubmit={handleSubmit}>
+//             <div className="reservation-form-head">
+//               <h2>Reserve a product</h2>
+//               <button type="button" className="form-close" onClick={() => setSearchParams({})}>✕</button>
+//             </div>
+//             <div className="reservation-form-grid">
+//               <div className="form-field full">
+//                 <label>Product (above ৳5,000)</label>
+//                 {presetProduct ? (
+//                   <div className="reserved-product-box">
+//                     <img src={selectedProduct?.image} alt={presetProduct} />
+//                     <div>
+//                       <strong>{presetProduct}</strong>
+//                       <span>{selectedProduct?.store} — ৳{selectedProduct?.price}</span>
+//                     </div>
+//                   </div>
+//                 ) : (
+//                   <select name="product" value={form.product} onChange={handleChange}>
+//                     <option value="">Select a product</option>
+//                     {reservable.map(p => (
+//                       <option key={p.id} value={p.name}>{p.name} — ৳{p.price}</option>
+//                     ))}
+//                   </select>
+//                 )}
+//               </div>
+//               <div className="form-field">
+//                 <label>Date</label>
+//                 <input type="date" name="date" value={form.date} onChange={handleChange} />
+//               </div>
+//               <div className="form-field">
+//                 <label>Time</label>
+//                 <input type="time" name="time" value={form.time} onChange={handleChange} />
+//               </div>
+//               <div className="form-field full">
+//                 <label>Notes (optional)</label>
+//                 <textarea
+//                   name="notes"
+//                   value={form.notes}
+//                   onChange={handleChange}
+//                   rows="2"
+//                   placeholder="Anything we should prepare for your visit..."
+//                 />
+//               </div>
+//             </div>
+//             <button type="submit" className="submit-reservation">Request Reservation</button>
+//           </form>
+//         )}
+
+//         <div className="reservations-tabs">
+//           {statuses.map(s => (
+//             <button
+//               key={s}
+//               className={`reservations-tab ${filter === s ? 'active' : ''}`}
+//               onClick={() => setFilter(s)}
+//             >
+//               {s === 'all' ? 'All' : s}
+//             </button>
+//           ))}
+//         </div>
+
+//         <div className="reservations-grid">
+//           {filtered.map(r => (
+//             <div key={r.id} className="reservation-card">
+//               <div className="reservation-card-header">
+//                 <span className="reservation-id">{r.id}</span>
+//                 <span className={`reservation-status ${r.status.toLowerCase()}`}>{r.status}</span>
+//               </div>
+//               <div className="reservation-body">
+//                 <h3>{r.product}</h3>
+//                 <p className="reservation-store">{r.store} — ৳{r.price}</p>
+//                 <div className="reservation-when">
+//                   <span>
+//                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+//                       <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+//                       <line x1="16" y1="2" x2="16" y2="6"></line>
+//                       <line x1="8" y1="2" x2="8" y2="6"></line>
+//                       <line x1="3" y1="10" x2="21" y2="10"></line>
+//                     </svg>
+//                     {r.date}
+//                   </span>
+//                   <span>
+//                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+//                       <circle cx="12" cy="12" r="10"></circle>
+//                       <polyline points="12 6 12 12 16 14"></polyline>
+//                     </svg>
+//                     {r.time}
+//                   </span>
+//                 </div>
+//                 {r.notes && <p className="reservation-notes">"{r.notes}"</p>}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         {filtered.length === 0 && (
+//           <div className="reservations-empty">
+//             <h3>No reservations found</h3>
+//             <p>Reserve a premium product to get started.</p>
+//           </div>
+//         )}
+//       </div>
+
+//       <Footer />
+//       <Toast show={showToast} message={toastMsg} onHide={() => setShowToast(false)} />
+//     </div>
+//   );
+// }
+
+// export default Reservations;
+
+
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import Toast from '../components/Toast';
-import { reservations as initialReservations } from '../services/reservationService';
-import { products, getReservableProducts } from '../services/productService';
+import { getReservations } from '../services/reservationService'; // সঠিক ইমপোর্ট
 import './Reservations.css';
 
 function Reservations() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const showForm = searchParams.get('new') === '1';
-  const presetProduct = searchParams.get('product') || '';
+  const [reservations, setReservations] = useState([]); // এখানে ডেটা সেভ হবে
+  const [loading, setLoading] = useState(true);
 
-  const reservable = getReservableProducts();
-
-  const [filter, setFilter] = useState('all');
-  const [list, setList] = useState(initialReservations);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
-  const [form, setForm] = useState({
-    product: presetProduct,
-    date: '',
-    time: '',
-    notes: ''
-  });
-
-  const statuses = ['all', 'Confirmed', 'Pending', 'Completed', 'Cancelled'];
-
-  const filtered = filter === 'all' ? list : list.filter(r => r.status === filter);
-
-  const selectedProduct = products.find(p => p.name === form.product);
-
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!form.product || !form.date || !form.time) {
-      setToastMsg('Please select product, date and time');
-      setShowToast(true);
-      return;
+  useEffect(() => {
+    async function loadReservations() {
+      try {
+        const data = await getReservations(); // এপিআই কল
+        setReservations(data);
+      } catch (error) {
+        console.error("Error fetching reservations:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-    const newReservation = {
-      id: `RES-${100 + list.length + 1}`,
-      product: form.product,
-      store: selectedProduct.store,
-      price: selectedProduct.price,
-      date: new Date(form.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      time: form.time,
-      notes: form.notes,
-      status: 'Pending'
-    };
-    setList([newReservation, ...list]);
-    setSearchParams({});
-    setForm({ product: '', date: '', time: '', notes: '' });
-    setToastMsg('Reservation request submitted');
-    setShowToast(true);
-  };
+    loadReservations();
+  }, []);
+
+  if (loading) return <div>Loading reservations...</div>;
 
   return (
     <div className="reservations-page">
       <Navbar />
-
       <div className="reservations-container">
-        <div className="reservations-header">
-          <div>
-            <h1>My Reservations</h1>
-            <p>Reserve premium products (above ৳5,000) and manage your bookings</p>
-          </div>
-          <div className="reservations-header-actions">
-            <Link to="/cart" className="header-secondary-btn">View Cart</Link>
-            {!showForm && (
-              <button className="new-reservation-btn" onClick={() => setSearchParams({ new: '1' })}>
-                + New Reservation
-              </button>
-            )}
-          </div>
-        </div>
-
-        {showForm && (
-          <form className="reservation-form" onSubmit={handleSubmit}>
-            <div className="reservation-form-head">
-              <h2>Reserve a product</h2>
-              <button type="button" className="form-close" onClick={() => setSearchParams({})}>✕</button>
-            </div>
-            <div className="reservation-form-grid">
-              <div className="form-field full">
-                <label>Product (above ৳5,000)</label>
-                {presetProduct ? (
-                  <div className="reserved-product-box">
-                    <img src={selectedProduct?.image} alt={presetProduct} />
-                    <div>
-                      <strong>{presetProduct}</strong>
-                      <span>{selectedProduct?.store} — ৳{selectedProduct?.price}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <select name="product" value={form.product} onChange={handleChange}>
-                    <option value="">Select a product</option>
-                    {reservable.map(p => (
-                      <option key={p.id} value={p.name}>{p.name} — ৳{p.price}</option>
-                    ))}
-                  </select>
-                )}
+        <h1>My Reservations</h1>
+        {reservations.length === 0 ? (
+          <p>No reservations found.</p>
+        ) : (
+          <div className="reservations-list">
+            {reservations.map(res => (
+              <div key={res.id} className="reservation-card">
+                <h3>{res.product}</h3>
+                <p>Status: {res.status}</p>
+                <p>Date: {res.date}</p>
               </div>
-              <div className="form-field">
-                <label>Date</label>
-                <input type="date" name="date" value={form.date} onChange={handleChange} />
-              </div>
-              <div className="form-field">
-                <label>Time</label>
-                <input type="time" name="time" value={form.time} onChange={handleChange} />
-              </div>
-              <div className="form-field full">
-                <label>Notes (optional)</label>
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="Anything we should prepare for your visit..."
-                />
-              </div>
-            </div>
-            <button type="submit" className="submit-reservation">Request Reservation</button>
-          </form>
-        )}
-
-        <div className="reservations-tabs">
-          {statuses.map(s => (
-            <button
-              key={s}
-              className={`reservations-tab ${filter === s ? 'active' : ''}`}
-              onClick={() => setFilter(s)}
-            >
-              {s === 'all' ? 'All' : s}
-            </button>
-          ))}
-        </div>
-
-        <div className="reservations-grid">
-          {filtered.map(r => (
-            <div key={r.id} className="reservation-card">
-              <div className="reservation-card-header">
-                <span className="reservation-id">{r.id}</span>
-                <span className={`reservation-status ${r.status.toLowerCase()}`}>{r.status}</span>
-              </div>
-              <div className="reservation-body">
-                <h3>{r.product}</h3>
-                <p className="reservation-store">{r.store} — ৳{r.price}</p>
-                <div className="reservation-when">
-                  <span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    {r.date}
-                  </span>
-                  <span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    {r.time}
-                  </span>
-                </div>
-                {r.notes && <p className="reservation-notes">"{r.notes}"</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="reservations-empty">
-            <h3>No reservations found</h3>
-            <p>Reserve a premium product to get started.</p>
+            ))}
           </div>
         )}
       </div>
-
       <Footer />
-      <Toast show={showToast} message={toastMsg} onHide={() => setShowToast(false)} />
     </div>
   );
 }

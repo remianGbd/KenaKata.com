@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { isTokenRevoked } = require("./tokenBlacklist");
 
 
 const verifyToken = (req,res,next)=>{
@@ -25,6 +26,12 @@ const verifyToken = (req,res,next)=>{
                 message:"Invalid token format"
             });
 
+        }
+
+        if(isTokenRevoked(token)){
+            return res.status(401).json({
+                message:"Token has been revoked"
+            });
         }
 
 

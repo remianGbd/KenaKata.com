@@ -44,6 +44,11 @@ function Navbar() {
               {link.label}
             </NavLink>
           ))}
+          {user?.role === 'VENDOR' && (
+            <NavLink to="/seller/dashboard" onClick={() => setOpen(false)}>
+              Seller Portal
+            </NavLink>
+          )}
           {user ? (
             <>
               <Link to="/profile" className="mobile-user-link" onClick={() => setOpen(false)}>

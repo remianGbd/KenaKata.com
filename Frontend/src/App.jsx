@@ -20,51 +20,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/admindashboard";
 import AddProduct from "./pages/AddProduct";
-
-
-function PortalStub({ title }) {
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f7f7f4",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #dedfd8",
-          borderRadius: 12,
-          padding: "48px 56px",
-          textAlign: "center",
-        }}
-      >
-        <h1
-          style={{
-            margin: "0 0 8px",
-            fontSize: 24,
-            color: "#11120f",
-          }}
-        >
-          {title}
-        </h1>
-
-        <p
-          style={{
-            margin: 0,
-            color: "#555750",
-            fontSize: 14,
-          }}
-        >
-          This portal is under construction — coming in the next phase.
-        </p>
-      </div>
-    </div>
-  );
-}
+import VendorDashboard from "./pages/VendorDashboard";
 
 
 function App() {
@@ -177,7 +133,9 @@ function App() {
             <Route
               path="/seller/dashboard"
               element={
-                <PortalStub title="Seller Portal" />
+                <ProtectedRoute roles={["VENDOR"]}>
+                  <VendorDashboard />
+                </ProtectedRoute>
               }
             />
 
@@ -195,7 +153,14 @@ function App() {
               }
             />
 
-            <Route path="/add-product" element={<AddProduct/>}/>
+            <Route
+              path="/add-product"
+              element={
+                <ProtectedRoute roles={["VENDOR"]}>
+                  <AddProduct />
+                </ProtectedRoute>
+              }
+            />
 
           </Routes>
 

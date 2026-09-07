@@ -254,7 +254,7 @@
 // }
 
 // export default ProductDetails;
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -267,11 +267,31 @@ import './ProductDetails.css';
 
 function ProductDetails() {
   const { id } = useParams();
-  const product = getProductById(id);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        setProduct(await getProductById(id));
+      } catch (error) {
+        console.error('Error loading product:', error);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div className="loading">Loading product...</div>;
+  }
 
   if (!product) {
     return (

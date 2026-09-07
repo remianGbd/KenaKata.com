@@ -149,6 +149,26 @@ checkRole("CUSTOMER"),
 
 });
 
+router.get("/vendor/me", verifyToken, checkRole("VENDOR"), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT r.reservation_id, r.product_id, r.store_id, r.payment_id,
+              r.deadline, r.status, r.customer_id,
+              p.name AS product_name, s.store_name
+       FROM reservations r
+       JOIN products p ON r.product_id = p.product_id
+       JOIN stores s ON r.store_id = s.store_id
+       WHERE s.vendor_id=$1
+       ORDER BY r.reservation_id DESC`,
+      [req.user.user_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 
 

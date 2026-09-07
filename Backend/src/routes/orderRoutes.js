@@ -121,6 +121,27 @@ checkRole("CUSTOMER"),
 
 });
 
+router.get("/vendor/me", verifyToken, checkRole("VENDOR"), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT o.order_id, o.total_amount, o.status, o.customer_id,
+              o.payment_id, oi.product_id, oi.quantity, oi.price_at_purchase,
+              p.name AS product_name, s.store_name
+       FROM orders o
+       JOIN order_items oi ON o.order_id = oi.order_id
+       JOIN products p ON oi.product_id = p.product_id
+       JOIN stores s ON p.store_id = s.store_id
+       WHERE s.vendor_id=$1
+       ORDER BY o.order_id DESC`,
+      [req.user.user_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 
 router.get("/customer/:id", //logged in customer er id , onno customer er order dekhte parbe na

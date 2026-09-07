@@ -5,7 +5,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import StoreCard from '../components/StoreCard';
 
-import { getStores } from '../services/api';
+// import { getStores } from '../services/api';
+
+import { getStores, getStoresByMarket } from '../services/storeService';
 
 import './Stores.css';
 
@@ -22,36 +24,50 @@ function Stores() {
   const [loading, setLoading] = useState(true);
 
 
+  // useEffect(() => {
+
+  //   async function loadStores() {
+
+  //     try {
+
+  //       const data = await getStores(marketId);
+
+  //       setStores(data);
+
+  //     }
+
+  //     catch(error) {
+
+  //       console.error(error);
+
+  //     }
+
+  //     finally {
+
+  //       setLoading(false);
+
+  //     }
+
+  //   }
+
+
+  //   loadStores();
+
+  // }, [marketId]);
   useEffect(() => {
-
-    async function loadStores() {
-
-      try {
-
-        const data = await getStores(marketId);
-
-        setStores(data);
-
-      }
-
-      catch(error) {
-
-        console.error(error);
-
-      }
-
-      finally {
-
-        setLoading(false);
-
-      }
-
+  async function loadStores() {
+    try {
+    
+      const data = marketId ? await getStoresByMarket(marketId) : await getStores();
+      setStores(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-
-    loadStores();
-
-  }, [marketId]);
+  }
+  loadStores();
+}, [marketId]);
 
 
 

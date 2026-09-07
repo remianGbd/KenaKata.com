@@ -8,13 +8,13 @@ import './Auth.css';
 function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', business_name: '' });
   const [role, setRole] = useState('CUSTOMER');
   const [error, setError] = useState('');
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password.length < 6) {
       setError('Password must be at least 6 characters');
@@ -24,11 +24,17 @@ function Register() {
       setError('Passwords do not match');
       return;
     }
-    const user = register({ name: form.name, email: form.email, password: form.password, role });
-    if (user) {
+    try {
+      await register({
+        name: form.name,
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+        role,
+        business_name: form.business_name,
+      });
       navigate('/');
-    } else {
-      setError('An account with this email already exists');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Unable to create account');
     }
   };
 
@@ -57,8 +63,8 @@ function Register() {
               </button>
               <button
                 type="button"
-                className={`role-option ${role === 'SELLER' ? 'active' : ''}`}
-                onClick={() => setRole('SELLER')}
+                className={`role-option ${role === 'VENDOR' ? 'active' : ''}`}
+                onClick={() => setRole('VENDOR')}
               >
                 <strong>Seller</strong>
                 <span>Manage your own store</span>
@@ -76,6 +82,19 @@ function Register() {
                 required
               />
             </div>
+            {role === 'VENDOR' && (
+              <div className="form-field">
+                <label>Business Name</label>
+                <input
+                  type="text"
+                  name="business_name"
+                  value={form.business_name}
+                  onChange={handleChange}
+                  placeholder="Your business name"
+                  required
+                />
+              </div>
+            )}
             <div className="form-field">
               <label>Email</label>
               <input

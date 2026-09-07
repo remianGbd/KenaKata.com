@@ -19,7 +19,7 @@ checkRole("VENDOR"),
 
   try {
 
-    const { market_id, store_name, address } = req.body;
+    const { market_id, store_name, address, description, logo_url, category } = req.body;
 
     const vendor_id = req.user.user_id;  //logged in vendor er id, onno vendor er jonno store create korte parbe na
 
@@ -38,17 +38,20 @@ checkRole("VENDOR"),
 
           store_name,
 
-          address
+          address,
+          description,
+          logo_url,
+          category
 
       )
 
-      VALUES($1,$2,$3,$4)
+      VALUES($1,$2,$3,$4,$5,$6,$7)
 
       RETURNING *
 
       `,
 
-      [vendor_id, market_id, store_name, address]
+      [vendor_id, market_id, store_name, address, description, logo_url, category]
 
     );
 
@@ -76,23 +79,12 @@ router.get("/", async (req, res) => {
 
     const { market_id } = req.query;
 
-    const result = await pool.query(
-
-      `
-
-      SELECT *
-
-      FROM stores
-
-      WHERE market_id = $1
-
-      ORDER BY store_id
-
-      `,
-
-      [market_id]
-
-    );
+    const result = market_id
+      ? await pool.query(
+          `SELECT * FROM stores WHERE market_id = $1 ORDER BY store_id`,
+          [market_id]
+        )
+      : await pool.query(`SELECT * FROM stores ORDER BY store_id`);
 
     res.json(result.rows);
 
@@ -106,6 +98,24 @@ router.get("/", async (req, res) => {
 
   }
 
+});
+
+router.get("/vendor/me", verifyToken, checkRole("VENDOR"), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.*, m.market_name
+       FROM stores s
+       LEFT JOIN markets m ON s.market_id = m.market_id
+       WHERE s.vendor_id=$1
+       ORDER BY s.store_id
+       LIMIT 1`,
+      [req.user.user_id]
+    );
+    res.json(result.rows[0] || null);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 
@@ -188,7 +198,7 @@ checkRole("VENDOR"),
 
     const store_id = req.params.id;
 
-    const { store_name, address } = req.body;
+    const { store_name, address, description, logo_url, category, market_id } = req.body;
 
     const vendor_id = req.user.user_id;  //logged in vendor er id
 
@@ -203,11 +213,19 @@ checkRole("VENDOR"),
 
           store_name=$1,
 
-          address=$2
+          address=$2,
 
-      WHERE store_id=$3
+          description=$3,
 
-      AND vendor_id=$4
+          logo_url=$4,
+
+          category=$5,
+
+          market_id=$6
+
+      WHERE store_id=$7
+
+      AND vendor_id=$8
 
       RETURNING *
 
@@ -218,6 +236,14 @@ checkRole("VENDOR"),
         store_name,
 
         address,
+
+        description,
+
+        logo_url,
+
+        category,
+
+        market_id,
 
         store_id,
 
